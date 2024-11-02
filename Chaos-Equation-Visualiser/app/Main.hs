@@ -4,15 +4,21 @@ import Graphics.Rendering.OpenGL
 -- Main function
 main :: IO ()
 
-x1, x2, y1, y2 :: GLfloat
-x1 = 0
-x2 = 0
-y1 = 0.4
-y2 = 0.4
+xCoord :: GLfloat -> GLfloat -> [GLfloat]
+yCoord :: GLfloat -> GLfloat -> [GLfloat]
+zCoord :: GLfloat -> GLfloat -> [GLfloat]
+pointGen :: GLfloat -> GLfloat -> [(GLfloat, GLfloat, GLfloat)]
+
+xCoord x r = iterate (\y -> r * y *(1 - y)) x
+yCoord i r = iterate (\y -> r * y *(1 - y)) i
+zCoord z r = iterate (\y -> r * y *(1 - y)) z
+    
+pointGen x r = [(xCoordinate, yCoordinate, zCoordinate) | (xCoordinate, yCoordinate, zCoordinate) <- zip3 (xCoord x r) (yCoord x r) (zCoord x r)]
 
 main = do
     _ <- getArgsAndInitialize        -- Initialize GLUT
-    _ <- createWindow "Simple OpenGL"     -- Create the window
+    _ <- createWindow "Chaos Equation Visualiser"     -- Create the window
+    _ <- fullScreenToggle
     displayCallback $= display        -- Set display callback
     mainLoop                         -- Start the main loop
 
@@ -20,7 +26,5 @@ main = do
 display :: DisplayCallback
 display = do
     clear [ColorBuffer]               -- Clear the color buffer
-    renderPrimitive Lines $ do
-        vertex $ vertex2 x1 y1
-        vertex $ vertex2 x2 y2    
+
     flush
